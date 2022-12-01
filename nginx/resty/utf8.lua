@@ -40,7 +40,6 @@ utf8.map = function (s, f, no_subs)
 
     if no_subs then
         for b, e in s:gmatch('()' .. pattern .. '()') do
-            ngx.say(e)
             i = i + 1
             local c = e - b
             f(i, c, b)
@@ -183,6 +182,26 @@ utf8.insert = function(s, sub_string, pos)
     pos = tonumber(pos) or (#t + 1)
     table.insert(t, pos, sub_string)
     return table.concat(t, "")
+end
+
+-- 替换字符串
+utf8.gsub = function(s, str_pattern, str_repl)
+
+    local t = utf8.to_table(s)
+    local len = utf8.len(str_pattern)
+
+    local str, temp, idx = "", "", 0
+    for i, char in ipairs(t) do
+        idx  = idx + 1
+        temp = temp .. char
+        if idx == len or i == #t then
+            if temp == str_pattern then temp = str_repl end
+            str  = str .. temp
+            idx  = 0
+            temp = ""
+        end
+    end
+    return str
 end
 
 return utf8
