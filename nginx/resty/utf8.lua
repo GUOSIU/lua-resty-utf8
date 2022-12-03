@@ -83,10 +83,6 @@ utf8.strip = function (s)
     return (s:gsub(pattern, function (c) return #c > 1 and '' end))
 end
 
-utf8.strip_mb4 = function (s)
-    return (s:gsub(pattern, function (c) return #c > 3 and '' end))
-end
-
 -- like string.sub() but i, j are utf8 strings
 -- a utf8-safe string.sub()
 utf8.sub = function (s, i, j)
@@ -123,30 +119,40 @@ utf8.sub = function (s, i, j)
     return (string.sub(s, i, b + c - 1))
 end
 
-utf8.mid = utf8.sub
+---------- 以下方法是新增的 ------------
 
+-- 过滤 mb4 及以上的字符
+utf8.strip_mb4 = function (s)
+    return (s:gsub(pattern, function (c) return #c > 3 and '' end))
+end
+
+-- 截取左边字符
 utf8.left = function (s, n)
     return utf8.sub(s, 0, n)
 end
 
+-- 截取右边字符
 utf8.right = function (s, n)
-    local len = utf8.len(s)
-    return utf8.sub(s, len+1-n, len)
+    return utf8.sub(s, 0-n)
 end
 
+-- 去掉左右两边的空白符号
 utf8.trim = function (s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
+-- 去掉左边空白符号
 utf8.ltrim = function (s)
     return (s:gsub("^%s+", ""))
 end
 
+-- 去掉右边空白符号
 utf8.rtrim = function (s)
     return (s:gsub("%s+$", ""))
 end
 
--- Ascii码算一位，非Ascii码算两位
+-- 单字节或双字节算一个宽度
+-- 三字节及以上算两个宽度，如中文、emoji符号
 utf8.width = function(s)
 
     local width, children = 0, 0
@@ -165,43 +171,6 @@ utf8.width = function(s)
     end
 
     return width
-end
-
--- 将字符串转换成表
-utf8.to_table = function(s)
-    local t = {}
-    for i, char in utf8.chars(s) do
-        t[i] = char
-    end
-    return t
-end
-
--- 插入新的字符串
-utf8.insert = function(s, sub_string, pos)
-    local t = utf8.to_table(s)
-    pos = tonumber(pos) or (#t + 1)
-    table.insert(t, pos, sub_string)
-    return table.concat(t, "")
-end
-
--- 替换字符串
-utf8.gsub = function(s, str_pattern, str_repl)
-
-    local t = utf8.to_table(s)
-    local len = utf8.len(str_pattern)
-
-    local str, temp, idx = "", "", 0
-    for i, char in ipairs(t) do
-        idx  = idx + 1
-        temp = temp .. char
-        if idx == len or i == #t then
-            if temp == str_pattern then temp = str_repl end
-            str  = str .. temp
-            idx  = 0
-            temp = ""
-        end
-    end
-    return str
 end
 
 return utf8
