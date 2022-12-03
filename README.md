@@ -217,9 +217,7 @@ utf8.rtrim(" 😀123中国人😀 ")
 #### utf8.width(s)
 - s: (string) the utf8 string
 
-return: 返回字符的宽度(用于打印计算)
-单字节或双字节算一个宽度，如 a、A、2
-三字节及以上算两个宽度，如中文、emoji符号
+return: 返回字符的宽度(用于打印计算)，单字节或双字节算一个宽度，如 a、A、2，三字节及以上算两个宽度，如中文、emoji符号
 
 ```lua
 utf8.width("😀123中国人😀")
